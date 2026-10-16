@@ -213,4 +213,6 @@ build/NovelReaderTests --benchmark 100
 
 ## 授权说明
 
-当前仓库尚未提供 `LICENSE` 文件，具体开源授权协议待维护者确定。
+本项目采用 [MIT License](LICENSE) 开源，版权归属为 `Copyright (c) 2026 lindaoxiong`。
+
+允许使用、复制、修改、分发及商业使用，分发时须保留版权声明和许可声明。软件按原样提供，不提供任何担保。完整条款见 [LICENSE](LICENSE) 。
