@@ -1,0 +1,12 @@
+build/
+.build/
+DerivedData/
+node_modules/
+.env*
+.DS_Store
+.idea/
+.vscode/
+.codex/
+.claude/
+*.xcuserstate
+xcuserdata/
