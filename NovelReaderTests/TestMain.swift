@@ -10,9 +10,11 @@ struct TestMain {
                 return
             }
             try testFileLoader()
+            try testChapterParser()
             try testReader()
             try await testRestore()
             try await testWindowControls()
+            try await testChapterJump()
         } catch {
             FileHandle.standardError.write(Data("FAIL: \(error.localizedDescription)\n".utf8))
             exit(1)

@@ -37,6 +37,9 @@ final class ReadingState: ObservableObject {
     @Published private(set) var isLoading = false
     @Published var errorMessage: String?
     @Published private(set) var documentID = UUID()
+    @Published private(set) var chapters: [Chapter] = []
+    @Published private(set) var chapterJump: ChapterJump?
+    @Published var chaptersPresented = false
     @Published private(set) var fontSize: Double {
         didSet { defaults.set(fontSize, forKey: "fontSize") }
     }
@@ -131,6 +134,12 @@ final class ReadingState: ObservableObject {
         }
     }
 
+    func selectChapter(_ chapter: Chapter) {
+        guard !isLoading, chapters.contains(chapter) else { return }
+        chapterJump = ChapterJump(documentID: documentID, offset: chapter.offset)
+        chaptersPresented = false
+    }
+
     func open(_ url: URL) async {
         guard !isLoading else { return }
         flushProgress?()
@@ -142,7 +151,13 @@ final class ReadingState: ObservableObject {
         }
         do {
             let loaded = try await FileLoader.load(url)
+            let parsed = await Task.detached(priority: .userInitiated) {
+                ChapterParser.parse(loaded)
+            }.value
             try progressStore.remember(url)
+            chaptersPresented = false
+            chapterJump = nil
+            chapters = parsed
             text = loaded
             fileURL = url
             documentID = UUID()

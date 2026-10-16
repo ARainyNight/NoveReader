@@ -30,6 +30,15 @@ struct ReaderView: View {
                     .help("打开其他小说（⌘O）")
                     .accessibilityLabel("打开其他小说")
                     .disabled(state.isLoading)
+                Button { state.chaptersPresented.toggle() } label: {
+                    Image(systemName: "list.bullet")
+                }
+                .help("选择章节（⌘⇧T）")
+                .accessibilityLabel("选择章节")
+                .disabled(state.text == nil || state.isLoading)
+                .popover(isPresented: $state.chaptersPresented) {
+                    ChapterListView(state: state)
+                }
                 Button { state.adjustFont(by: -2) } label: { Image(systemName: "textformat.size.smaller") }
                     .help("减小字号（⌘−）")
                     .accessibilityLabel("减小字号")
@@ -70,9 +79,9 @@ struct ReaderView: View {
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
             .padding(12)
             .onHover { controlsVisible = $0 }
-            .opacity(controlsVisible || state.appearanceSettingsPresented ? 1 : 0)
-            .allowsHitTesting(controlsVisible || state.appearanceSettingsPresented)
-            .accessibilityHidden(!controlsVisible && !state.appearanceSettingsPresented)
+            .opacity(controlsVisible || state.appearanceSettingsPresented || state.chaptersPresented ? 1 : 0)
+            .allowsHitTesting(controlsVisible || state.appearanceSettingsPresented || state.chaptersPresented)
+            .accessibilityHidden(!controlsVisible && !state.appearanceSettingsPresented && !state.chaptersPresented)
         }
         .overlay { WindowResizeEdges() }
         .background(ReaderWindow(hidesBorder: state.hidesWindowBorder, backgroundColor: state.backgroundColor))

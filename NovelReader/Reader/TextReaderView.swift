@@ -5,7 +5,7 @@ struct TextReaderView: NSViewRepresentable {
     let text: String
     var fontSize: Double = 20
     var theme: ReaderTheme = .light
-    let state: ReadingState
+    @ObservedObject var state: ReadingState
 
     func makeCoordinator() -> ReaderCoordinator { ReaderCoordinator(state: state) }
 
@@ -27,6 +27,7 @@ struct TextReaderView: NSViewRepresentable {
         (scroll as? ReaderScrollView)?.applyFont(fontSize)
         (scroll as? ReaderScrollView)?.applyTheme(theme)
         (scroll as? ReaderScrollView)?.applyColors(foreground: state.foregroundColor, background: state.backgroundColor)
+        context.coordinator.handleChapterJump()
     }
 }
 
@@ -60,7 +61,7 @@ final class ReaderScrollView: NSScrollView {
         view.autoresizingMask = [.width]
         view.textContainer?.widthTracksTextView = true
         view.textContainer?.lineFragmentPadding = 0
-        view.textContainerInset = NSSize(width: 40, height: 56)
+        view.textContainerInset = NSSize(width: 12, height: 56)
         documentView = view
     }
 
@@ -98,7 +99,9 @@ final class ReaderScrollView: NSScrollView {
         resizeAnchor = nil
         let index = min(max(0, position), length - 1)
         // Let NSTextView maintain TextKit 2's viewport anchor; fragment frames are estimates.
-        readerTextView.scrollRangeToVisible(NSRange(location: index, length: 1))
+        let range = (readerTextView.string as NSString).rangeOfComposedCharacterSequence(at: index)
+        readerTextView.scrollRangeToVisible(range)
+        readerTextView.textLayoutManager?.textViewportLayoutController.layoutViewport()
     }
 
     override func setFrameSize(_ newSize: NSSize) {
@@ -120,11 +123,6 @@ final class ReaderScrollView: NSScrollView {
 
     override func layout() {
         super.layout()
-        let width = contentSize.width
-        let inset = min(32, width / 10) + max(0, (width - 804) / 2)
-        if abs(readerTextView.textContainerInset.width - inset) > 0.5 {
-            readerTextView.textContainerInset = NSSize(width: inset, height: 56)
-        }
         if initialPosition != nil || resizeAnchor != nil, !resizeScheduled,
            window != nil, contentSize.width > 0, contentSize.height > 0 {
             resizeScheduled = true

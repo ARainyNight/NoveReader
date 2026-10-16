@@ -60,6 +60,10 @@ struct ReaderCommands: Commands {
                 .disabled(state.isLoading)
         }
         CommandMenu("阅读") {
+            Button("选择章节…") { showWindow(); state.chaptersPresented = true }
+                .keyboardShortcut("t", modifiers: [.command, .shift])
+                .disabled(state.text == nil || state.isLoading)
+            Divider()
             Button("增大字号") { state.adjustFont(by: 2) }
                 .keyboardShortcut("+", modifiers: .command)
                 .disabled(state.fontSize >= 40)

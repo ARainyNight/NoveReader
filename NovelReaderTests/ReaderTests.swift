@@ -41,7 +41,7 @@ func testReader() throws {
     try verify(scroll.readerTextView.textColor == ReaderTheme.light.foreground, "Light foreground")
     window.setContentSize(NSSize(width: 1100, height: 600))
     window.contentView?.layoutSubtreeIfNeeded()
-    try verify(scroll.readerTextView.textContainerInset.width >= 32, "Reading margins")
+    try verify(scroll.readerTextView.textContainerInset.width == 12, "Wide window keeps 12pt reading margins")
     scroll.restorePosition(70_000)
     RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.1))
     try verifyPositionVisible(scroll, 70_000, "Restore distant character index")
